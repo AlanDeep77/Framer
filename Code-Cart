@@ -1,0 +1,52 @@
+import { useState } from "react";
+
+// Override para el carrito
+export function Cart(props) {
+  const [quantity, setQuantity] = useState(1); // Estado para la cantidad de productos
+  const [cart, setCart] = useState([]); // Estado para el carrito
+
+  // Función para manejar el aumento de cantidad
+  const handleIncrease = () => {
+    setQuantity(prevQuantity => prevQuantity + 1);
+  };
+
+  // Función para manejar la disminución de cantidad
+  const handleDecrease = () => {
+    setQuantity(prevQuantity => (prevQuantity > 1 ? prevQuantity - 1 : 1));
+  };
+
+  // Función para añadir al carrito
+  const handleAddToCart = () => {
+    const product = {
+      id: props.id,  // Tomando el ID desde las props, asegurándose de que sea único
+      name: props.name || "Producto",  // Nombre del producto
+      price: props.price || 0,  // Precio del producto
+      quantity,  // Cantidad del producto seleccionada
+    };
+
+    setCart(prevCart => {
+      const existingProduct = prevCart.find(item => item.id === product.id);
+
+      if (existingProduct) {
+        // Si el producto ya existe en el carrito, actualizar su cantidad
+        return prevCart.map(item =>
+          item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
+        );
+      } else {
+        // Si el producto no está en el carrito, agregarlo
+        return [...prevCart, product];
+      }
+    });
+
+    alert(`${product.name} añadido al carrito con cantidad: ${quantity}`);
+  };
+
+  // Retornar los valores del override
+  return {
+    onIncrease: handleIncrease, // Asignar la función de incremento al botón
+    onDecrease: handleDecrease, // Asignar la función de decremento al botón
+    onAddToCart: handleAddToCart, // Asignar la función de añadir al carrito
+    quantity, // Pasar la cantidad como propiedad para actualizar la UI
+    cart, // Pasar el carrito como propiedad para interactuar con la ventana lateral
+  };
+}
